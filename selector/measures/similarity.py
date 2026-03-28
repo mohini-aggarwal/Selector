@@ -31,6 +31,8 @@ __all__ = [
     "pairwise_similarity_bit",
     "tanimoto",
     "modified_tanimoto",
+    "dice_similarity",
+    "cosine_similarity",
     "scaled_similarity_matrix",
 ]
 
@@ -44,7 +46,7 @@ def pairwise_similarity_bit(X: np.array, metric: str) -> np.ndarray:
         Feature matrix of `n_samples` samples in `n_features` dimensional space.
     metric : str
         The metric used when calculating similarity coefficients between samples in a feature array.
-        Method for calculating similarity coefficient. Options: `"tanimoto"`, `"modified_tanimoto"`.
+        Method for calculating similarity coefficient. Options: "tanimoto", "modified_tanimoto", "dice", "cosine".
 
     Returns
     -------
@@ -57,7 +59,9 @@ def pairwise_similarity_bit(X: np.array, metric: str) -> np.ndarray:
     available_methods = {
         "tanimoto": tanimoto,
         "modified_tanimoto": modified_tanimoto,
-    }
+        "dice": dice_similarity,
+        "cosine": cosine_similarity,
+}
     if metric not in available_methods:
         raise ValueError(
             f"Argument metric={metric} is not recognized! Choose from {available_methods.keys()}"
@@ -324,3 +328,39 @@ def _compute_base_descriptors(x, y):
     d = np.dot(1 - x, 1 - y)
     dis = p - a - d
     return a, d, dis, p
+
+
+def dice_similarity(a: np.array, b: np.array) -> float:
+    """Compute Dice similarity coefficient."""
+
+    if a.ndim != 1 or b.ndim != 1:
+        raise ValueError("Arguments must be 1D arrays")
+
+    if a.shape != b.shape:
+        raise ValueError("Arrays must have same shape")
+
+    intersection = np.sum(a * b)
+    denom = np.sum(a) + np.sum(b)
+
+    if denom == 0:
+        return 0.0
+
+    return (2 * intersection) / denom
+
+
+def cosine_similarity(a: np.array, b: np.array) -> float:
+    """Compute cosine similarity."""
+
+    if a.ndim != 1 or b.ndim != 1:
+        raise ValueError("Arguments must be 1D arrays")
+
+    if a.shape != b.shape:
+        raise ValueError("Arrays must have same shape")
+
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+
+    return np.dot(a, b) / (norm_a * norm_b)
