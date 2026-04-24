@@ -97,16 +97,16 @@ OptiSim selects a diverse subset of samples using a distance-based strategy:
 import numpy as np
 from selector.methods.distance import OptiSim
 
-# Set seed for reproducibility
+# Reproducibility for synthetic dataset generation
 np.random.seed(0)
 
 # Example dataset: 100 samples, 10 features
 X = np.random.rand(100, 10)
 
-# Initialize OptiSim with fixed parameters
+# OptiSim with fixed randomness
 selector = OptiSim(r0=0.5, random_seed=42)
 
-# Select 10 diverse samples
+# Request ~10 diverse samples (exact number may vary depending on algorithm convergence)
 selected_indices = selector.select_from_cluster(X, size=10)
 
 print(f"Selected {len(selected_indices)} samples:")
